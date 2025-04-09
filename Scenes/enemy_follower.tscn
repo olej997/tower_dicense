@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bk3gyi2t8l25y"]
+
+[ext_resource type="Script" uid="uid://b2quxej8g3cl3" path="res://EnemyFollower.gd" id="1_makpu"]
+
+[node name="EnemyFollower" type="PathFollow2D" groups=["enemies"]]
+process_mode = 1
+script = ExtResource("1_makpu")

@@ -1,0 +1,75 @@
+{
+	"maps": [
+		{
+			"map_id": "forest_1",
+			"tier": 1,
+			"name": "Las Cieni",
+			"description": "Mroczny las pełen szybkich i słabych przeciwników.",
+			"enemies": [
+				{"type": "EnemyFast", "count": 1},
+				{"type": "Enemy", "count": 1}
+			],
+			"reward": {
+				"type": "gold",
+				"amount": 50
+			}
+		},
+		{
+			"map_id": "desert_1",
+			"tier": 1,
+			"name": "Pustynia Chaosu",
+			"description": "Fale przeciwników są bardziej zróżnicowane.",
+			"enemies": [
+				{"type": "EnemyFast", "count": 1},
+				{"type": "Enemy", "count": 1}
+			],
+			"reward": {
+				"type": "item",
+				"item_id": "fire_stone"
+			}
+		},
+		{
+			"map_id": "desert_2",
+			"tier": 1,
+			"name": "Pustynia bez Chaosu",
+			"description": "Fale przeciwników są bardziej zróżnicowane.",
+			"enemies": [
+				{"type": "EnemyFast", "count": 1},
+				{"type": "Enemy", "count": 1}
+			],
+			"reward": {
+				"type": "item",
+				"item_id": "fire_stone"
+			}
+		},
+		{
+			"map_id": "desert_3",
+			"tier": 2,
+			"name": "Pustynia bez Chaosu",
+			"description": "Fale przeciwników są bardziej zróżnicowane.",
+			"enemies": [
+				{"type": "EnemyFast", "count": 1},
+				{"type": "Enemy", "count": 1}
+			],
+			"reward": {
+				"type": "item",
+				"item_id": "fire_stone"
+			}
+		},
+		{
+			"map_id": "desert_4",
+			"tier": 2,
+			"name": "Pustynia bez Chaosu",
+			"description": "Fale przeciwników są bardziej zróżnicowane.",
+			"enemies": [
+				{"type": "EnemyFast", "count": 1},
+				{"type": "Enemy", "count": 1}
+				
+			],
+			"reward": {
+				"type": "item",
+				"item_id": "fire_stone"
+			}
+		}
+	]
+}

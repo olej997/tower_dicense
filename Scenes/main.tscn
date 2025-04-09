@@ -1,0 +1,160 @@
+[gd_scene load_steps=9 format=3 uid="uid://bjmjcwi8wn08s"]
+
+[ext_resource type="Script" uid="uid://dpbs0jnu8wk57" path="res://GameManager.gd" id="1_1l1h1"]
+[ext_resource type="PackedScene" uid="uid://kdadp51nn276" path="res://Scenes/turret.tscn" id="2_4u5tw"]
+[ext_resource type="Texture2D" uid="uid://b01mss082bst0" path="res://assets/mapa1.png" id="3_21xkr"]
+[ext_resource type="Script" uid="uid://i4ew05ewxllu" path="res://WaveManager.gd" id="5_uft3b"]
+[ext_resource type="PackedScene" uid="uid://dwn275gb3yb8g" path="res://Scenes/hero.tscn" id="7_53y40"]
+[ext_resource type="Script" uid="uid://cnj0r328l4e6q" path="res://TurretStatsUI.gd" id="7_gjh24"]
+
+[sub_resource type="Curve2D" id="Curve2D_8uuy5"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 56, 271, 0, 0, 0, 0, 430, 273, 0, 0, 0, 0, 496, 77, 0, 0, 0, 0, 428, -397, 0, 0, 0, 0, 584, -489, 0, 0, 0, 0, 958, -465, 0, 0, 0, 0, 1007, -198, 0, 0, 0, 0, 995, -5, 0, 0, 0, 0, 1001, 256, 0, 0, 0, 0, 1338, 303, 0, 0, 0, 0, 1547, 285, 0, 0, 0, 0, 1549, -17, 0, 0, 0, 0, 1442, -417, 0, 0, 0, 0, 1979, -411)
+}
+point_count = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kg7vx"]
+
+[node name="Main" type="Node2D" node_paths=PackedStringArray("score_label", "victory_label")]
+process_mode = 3
+position = Vector2(-5, -2)
+script = ExtResource("1_1l1h1")
+score_label = NodePath("Label")
+victory_label = NodePath("VictoryLabel")
+turret_scene = ExtResource("2_4u5tw")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(966.345, 541.96)
+scale = Vector2(0.999403, 1.00378)
+texture = ExtResource("3_21xkr")
+
+[node name="VictoryLabel" type="Label" parent="."]
+top_level = true
+offset_left = 432.0
+offset_top = 314.0
+offset_right = 725.0
+offset_bottom = 383.0
+theme_override_font_sizes/font_size = 50
+text = "Zwycięstwo!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NextTierButton" type="Button" parent="VictoryLabel"]
+layout_mode = 0
+offset_left = 257.0
+offset_top = 146.0
+offset_right = 661.0
+offset_bottom = 550.0
+
+[node name="EnemyPath" type="Path2D" parent="."]
+position = Vector2(-54, 657)
+curve = SubResource("Curve2D_8uuy5")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 1477.0
+offset_top = 58.0
+offset_right = 1805.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 60
+text = "Hajs: 0"
+
+[node name="WaveManager" type="Node" parent="." node_paths=PackedStringArray("enemy_path")]
+process_mode = 1
+script = ExtResource("5_uft3b")
+enemy_path = NodePath("../EnemyPath")
+
+[node name="EnemySpawnTimer" type="Timer" parent="WaveManager"]
+wait_time = 3.0
+autostart = true
+
+[node name="Button" type="Button" parent="."]
+offset_left = 1208.0
+offset_top = 179.0
+offset_right = 1402.0
+offset_bottom = 232.0
+focus_mode = 0
+text = "Postaw wieżyczkę"
+
+[node name="UI" type="Control" parent="." groups=["stats_ui"]]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1247.0
+offset_top = 472.0
+offset_right = 1875.0
+offset_bottom = 1051.0
+script = ExtResource("7_gjh24")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI"]
+layout_mode = 0
+offset_left = -20.0
+offset_top = -170.0
+offset_right = 303.0
+offset_bottom = -70.0
+
+[node name="TargetingModeLabel" type="Label" parent="UI/VBoxContainer"]
+layout_mode = 2
+
+[node name="ChangeTargetingModeButton" type="Button" parent="UI/VBoxContainer"]
+layout_mode = 2
+
+[node name="TurretStatsPanel" type="Panel" parent="UI"]
+custom_minimum_size = Vector2(300, 200)
+layout_mode = 0
+offset_left = -21.0
+offset_top = -61.0
+offset_right = 550.0
+offset_bottom = 268.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_kg7vx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/TurretStatsPanel"]
+layout_mode = 1
+anchors_preset = -1
+offset_right = 626.0
+offset_bottom = 581.0
+
+[node name="TurretName" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="DamageLabel" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="FireRateLabel" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RangeLabel" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="CritChanceLabel" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="TurretGroupLabel" type="Label" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TurretStatsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="UpgradeRed" type="Button" parent="UI/TurretStatsPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "DMG+1
+"
+icon_alignment = 1
+
+[node name="UpgradeGreen" type="Button" parent="UI/TurretStatsPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Fire Rate -0.3"
+
+[node name="UpgradeYellow" type="Button" parent="UI/TurretStatsPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Crit +20%"
+
+[node name="UpgradeBlue" type="Button" parent="UI/TurretStatsPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+text = "Range: *1.2"
+
+[node name="Hero" parent="." instance=ExtResource("7_53y40")]
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

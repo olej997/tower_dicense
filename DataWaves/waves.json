@@ -1,0 +1,22 @@
+{
+	"waves": [
+		{
+			"groups": [
+				{
+					"time": 1,
+					"enemies": [
+						{"type": "Enemy", "count": 2},
+						{"type": "EnemyFast", "count": 2}
+					]
+				},
+				{
+					"time": 10,
+					"enemies": [
+						{"type": "Enemy", "count": 2},
+						{"type": "EnemyFast", "count": 1}
+					]
+				}
+			]
+		}
+	]
+}

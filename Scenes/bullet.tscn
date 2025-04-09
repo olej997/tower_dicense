@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://cdatlfxa3071u"]
+
+[ext_resource type="Script" uid="uid://dule4ak22c1o0" path="res://Bullet.gd" id="1_t1ll7"]
+[ext_resource type="Texture2D" uid="uid://dyiidiyxnmjyj" path="res://assets/Strzała.png" id="2_ejx7d"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wrhqw"]
+size = Vector2(4.01228, 5.99372)
+
+[node name="Bullet" type="Area2D" groups=["bullets"]]
+process_mode = 1
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_t1ll7")
+
+[node name="dot_bullet" type="Sprite2D" parent="."]
+rotation = 1.57151
+scale = Vector2(0.0419506, 0.0419506)
+texture = ExtResource("2_ejx7d")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(13.0026, 0.0864855)
+rotation = -1.56462
+shape = SubResource("RectangleShape2D_wrhqw")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
