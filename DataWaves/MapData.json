@@ -48,8 +48,8 @@
 			"name": "Pustynia bez Chaosu",
 			"description": "Fale przeciwników są bardziej zróżnicowane.",
 			"enemies": [
-				{"type": "EnemyFast", "count": 1},
-				{"type": "Enemy", "count": 1}
+				{"type": "EnemyFast", "count": 10},
+				{"type": "Enemy", "count": 10}
 			],
 			"reward": {
 				"type": "item",
@@ -62,8 +62,8 @@
 			"name": "Pustynia bez Chaosu",
 			"description": "Fale przeciwników są bardziej zróżnicowane.",
 			"enemies": [
-				{"type": "EnemyFast", "count": 1},
-				{"type": "Enemy", "count": 1}
+				{"type": "EnemyFast", "count": 10},
+				{"type": "Enemy", "count": 10}
 				
 			],
 			"reward": {

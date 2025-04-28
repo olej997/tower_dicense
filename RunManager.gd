@@ -74,57 +74,32 @@ func get_current_tier_maps():
 
 # 📌 Ustawienie wybranej mapy
 func set_selected_map(map_id):
-	print("📌 Wybrano mapę:", map_id, "dla tieru:", current_tier)
 	selected_maps.append(map_id)
-	print("📌 Historia wybranych map:", selected_maps)
 	
-	# Załaduj i zmień scenę
-	var next_scene = load("res://Scenes/Main.tscn")
+	var next_scene = load("res://Scenes/main.tscn")
 	if next_scene:
-		print("✅ Scena Main.tscn załadowana")
-		var result = get_tree().change_scene_to_packed(next_scene)
-		if result == OK:
-			print("✅ Zmiana sceny powiodła się")
-		else:
-			print("❌ Błąd podczas zmiany sceny:", result)
-	else:
-		print("❌ Nie można załadować sceny Main.tscn")
+		call_deferred("_do_change_scene", next_scene)
 
 # 📌 Przejście do kolejnego tieru
 func advance_tier():
 	if current_tier < MAX_TIERS:
 		current_tier += 1
-		print("📢 Przechodzimy do tieru:", current_tier)
 		
-		# Załaduj i zmień scenę
 		var next_scene = load("res://Scenes/MapSelection.tscn")
 		if next_scene:
-			print("✅ Scena MapSelection.tscn załadowana")
 			call_deferred("_do_change_scene", next_scene)
-		else:
-			print("❌ Nie można załadować sceny MapSelection.tscn")
 	else:
-		print("🎉 Run zakończony! Gratulacje!")
 		finish_run()
 
 func _do_change_scene(packed_scene):
-	print("🔄 Wykonuję zmianę sceny...")
 	var tree = get_tree()
 	if tree:
 		var result = tree.change_scene_to_packed(packed_scene)
-		if result == OK:
-			print("✅ Zmiana sceny powiodła się")
-		else:
+		if result != OK:
 			print("❌ Błąd podczas zmiany sceny:", result)
-	else:
-		print("❌ Nie można uzyskać dostępu do SceneTree podczas zmiany sceny!")
 
 # 📌 Zakończenie runu
 func finish_run():
-	print("🎉 Podsumowanie runu:")
-	print("- Przebyte mapy:", selected_maps)
-	print("- Poziom bohatera:", hero_data["level"])
-	print("- Zdobyte skille:", hero_data["skills"])
 	get_tree().change_scene_to_file("res://Scenes/VictoryScreen.tscn")
 
 # 📌 Aktualizacja ulepszeń wieżyczek

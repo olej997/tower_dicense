@@ -17,9 +17,9 @@ var turret_group: String = "default"  # Domyślna grupa
 # 📌 Tekstury ulepszonych wieżyczek
 var textures = {
 	"red": preload("res://assets/Turret_czerwony.png"),
-	"green": preload("res://assets/Turret_zielony.png"),
-	"yellow": preload("res://assets/Turret_zolty.png"),
-	"blue": preload("res://assets/Turret_niebieski.png")
+	"green": preload("res://assets/turret_zielony.png"),
+	"yellow": preload("res://assets/turret_zolty.png"),
+	"blue": preload("res://assets/turret_niebieski.png")
 }
 # ⚙️ Stan wieżyczki
 var target: Node2D = null  # Aktualny cel (wróg w zasięgu)

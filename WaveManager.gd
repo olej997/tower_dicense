@@ -90,7 +90,7 @@ func start_spawning_enemies():
 func spawn_enemy(enemy_type: String):
 	if is_paused:
 		return  
-	var enemy_follower = load("res://Scenes/Enemy_Follower.tscn").instantiate()
+	var enemy_follower = load("res://Scenes/enemy_follower.tscn").instantiate()
 	enemy_follower.progress = 0  
 	enemy_follower.enemy_type = enemy_type  
 	enemy_path.add_child(enemy_follower)  

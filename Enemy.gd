@@ -16,8 +16,8 @@ func _ready():
 	health_bar = $CanvasLayer/ProgressBar  # Pobieramy referencję do paska zdrowia z hierarchii węzłów (CanvasLayer, aby pasek nie obracał się razem z wrogiem).
 	health_bar.max_value = max_health  # Ustawiamy maksymalną wartość paska zdrowia, aby odpowiadała maksymalnemu zdrowiu wroga.
 	health_bar.value = current_health  # Ustawiamy aktualną wartość paska zdrowia na bieżące zdrowie wroga.
-		# 📌 Podpinamy sygnał wykrywania bohatera
-	if attack_zone:
+	# 📌 Podpinamy sygnał wykrywania bohatera
+	if attack_zone and not attack_zone.is_connected("area_entered", Callable(self, "_on_hero_entered")):
 		attack_zone.connect("area_entered", Callable(self, "_on_hero_entered"))
 func get_speed():
 	return speed

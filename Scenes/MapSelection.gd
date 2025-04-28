@@ -1,114 +1,202 @@
+# Kontroler sceny wyboru mapy
 extends Control
-var map_data = []  # Lista mapek do wyboru (z JSON)
-var selected_tier = 1  # Domyślny tier mapek
 
-@onready var map1_info = $VBoxContainer/Map1Container/Map1Info
-@onready var map2_info = $VBoxContainer/Map2Container/Map2Info
-@onready var map_button_1 = $VBoxContainer/Map1Container/MapButton1
-@onready var map_button_2 = $VBoxContainer/Map2Container/MapButton2
-@onready var return_button = $VBoxContainer/ReturnButton
+# Zmienne globalne
+var map_data = []  # Lista dostępnych map wczytanych z JSON
+var selected_tier = 1  # Aktualny poziom trudności (tier)
+var available_maps = []  # Mapy dostępne dla aktualnego tieru
 
+# Referencje do elementów UI
+@onready var map1_info = $VBoxContainer/Map1Container/Map1Info  # Panel informacji o pierwszej mapie
+@onready var map2_info = $VBoxContainer/Map2Container/Map2Info  # Panel informacji o drugiej mapie
+@onready var map_button_1 = $VBoxContainer/Map1Container/MapButton1  # Przycisk wyboru pierwszej mapy
+@onready var map_button_2 = $VBoxContainer/Map2Container/MapButton2  # Przycisk wyboru drugiej mapy
+@onready var return_button = $VBoxContainer/ReturnButton  # Przycisk powrotu do menu
+
+# Inicjalizacja sceny
 func _ready():
-	print("🌀 MapSelection załadowana jako:" + str(self))
-	load_map_data()
+	# Upewniamy się, że gra nie jest spauzowana
+	var tree = get_tree()
+	if tree:
+		tree.paused = false
 	
+	# Pobieramy RunManager i sprawdzamy dostępne mapy
 	var run_manager = get_tree().get_first_node_in_group("run_manager")
-	if run_manager:
-		selected_tier = run_manager.current_tier
-		print("📢 Wybór mapy dla tieru:", selected_tier)
-
-	display_map_choices()
+	if not run_manager:
+		print("❌ Nie znaleziono run_manager!")
+		return
+		
+	selected_tier = run_manager.current_tier
 	
-# Najpierw rozłączamy, jeśli już podłączone
-	if map_button_1.is_connected("pressed", Callable(self, "_on_map1_pressed")):
-		map_button_1.pressed.disconnect(Callable(self, "_on_map1_pressed"))
-	map_button_1.pressed.connect(_on_map1_pressed)
-
-	if map_button_2.is_connected("pressed", Callable(self, "_on_map2_pressed")):
-		map_button_2.pressed.disconnect(Callable(self, "_on_map2_pressed"))
-	map_button_2.pressed.connect(_on_map2_pressed)
-
-	if return_button.is_connected("pressed", Callable(self, "_on_return_pressed")):
-		return_button.pressed.disconnect(Callable(self, "_on_return_pressed"))
-	return_button.pressed.connect(_on_return_pressed)
-
-	print("✅ Sygnały zostały podłączone ponownie")
-	#await get_tree().create_timer(2.0).timeout
-	#print("🧪 Testowe kliknięcie...")
-	#map_button_1.emit_signal("pressed")
-
-func _on_map1_pressed():
-	print("📌 Wybrano mapę: 0")
-	select_map(0)
-
-func _on_map2_pressed():
-	print("📌 Wybrano mapę: 1")
-	select_map(1)
-	
-
-
-func load_map_data():
-	print("wczytano json")
-	var file = FileAccess.open("res://DataWaves/MapData.json", FileAccess.READ)
-	if file:
-		var content = file.get_as_text()
-		var parsed_data = JSON.parse_string(content)
-		if parsed_data is Dictionary and parsed_data.has("maps"):
-			# Tworzymy pusty słownik dla tierów
-			map_data = {}
+	# Pobieramy i wyświetlamy mapy dla aktualnego tieru
+	var tier_str = str(selected_tier)
+	var tier_maps = run_manager.tier_maps
+	if tier_maps.has(tier_str):
+		var available_maps = tier_maps[tier_str]
+		
+		if available_maps.size() < 2:
+			print("❌ Niewystarczająca liczba map dla tieru:", selected_tier)
+			return
 			
-			# Grupujemy mapy według poziomu trudności (tier)
-			for map_entry in parsed_data["maps"]:
-				var tier = str(int(map_entry["tier"]))  # Klucz jako string
-				if not map_data.has(tier):
-					map_data[tier] = []  # Tworzymy listę dla tieru
-				map_data[tier].append(map_entry)  # Dodajemy mapę do tieru
-		else:
-			map_data = {}
-		file.close()
+		# Wybieramy dwie mapy do wyświetlenia
+		var selected_maps = []
+		for i in range(2):
+			selected_maps.append(available_maps[i])
+		
+		display_map_choices(selected_maps)
+		_ensure_input_handling()
+	else:
+		print("❌ Brak map dla tieru:", tier_str)
 
+# Obsługa zdarzeń systemowych
+func _notification(what):
+	match what:
+		NOTIFICATION_READY, NOTIFICATION_ENTER_TREE, NOTIFICATION_VISIBILITY_CHANGED:
+			if visible:
+				_ensure_input_handling()
 
-# 🎲 Losowanie dwóch map do wyboru dla gracza
-func display_map_choices():
-	print("📌 selected_tier:", selected_tier, "| Typ:", typeof(selected_tier))
-	print("📌 Dostępne tiery w map_data:", map_data.keys())
+# Obsługa wejścia myszy
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			if map_button_1 and map_button_2:
+				var button1_rect = map_button_1.get_global_rect()
+				var button2_rect = map_button_2.get_global_rect()
+				
+				if button1_rect.has_point(event.position):
+					_handle_map1_pressed()
+					accept_event()
+					return
+				elif button2_rect.has_point(event.position):
+					_handle_map2_pressed()
+					accept_event()
 
-	if not map_data.has(str(selected_tier)):
-		print("❌ Brak map dla tieru:", selected_tier)  # ✅ Debug
-		return  # Jeśli nie ma map dla tego tieru, wyjdź
+# Obsługa wejścia GUI
+func _gui_input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if map_button_1 and map_button_2:
+			var button1_rect = map_button_1.get_global_rect()
+			var button2_rect = map_button_2.get_global_rect()
+			
+			if button1_rect.has_point(event.position):
+				_handle_map1_pressed()
+				accept_event()
+			elif button2_rect.has_point(event.position):
+				_handle_map2_pressed()
+				accept_event()
 
-	var tier_maps = map_data[str(selected_tier)]
-	tier_maps.shuffle()  # Losujemy kolejność mapek
+# Sygnały przycisków
+func _on_button1_pressed():
+	_handle_map1_pressed()
 
-	# Pobieramy 2 pierwsze losowe mapki
-	var map1 = tier_maps[0]
-	var map2 = tier_maps[1]
+func _on_button2_pressed():
+	_handle_map2_pressed()
+
+# Obsługa wyboru pierwszej mapy
+func _handle_map1_pressed():
+	if not map_button_1:
+		return
+		
+	if map_button_1.has_meta("map_id"):
+		var chosen_map_id = map_button_1.get_meta("map_id")
+		
+		var run_manager = get_tree().get_first_node_in_group("run_manager")
+		if run_manager:
+			run_manager.set_selected_map(chosen_map_id)
+			call_deferred("_safe_change_to_main")
+
+# Obsługa wyboru drugiej mapy
+func _handle_map2_pressed():
+	if not map_button_2:
+		return
+		
+	if map_button_2.has_meta("map_id"):
+		var chosen_map_id = map_button_2.get_meta("map_id")
+		
+		var run_manager = get_tree().get_first_node_in_group("run_manager")
+		if run_manager:
+			run_manager.set_selected_map(chosen_map_id)
+			call_deferred("_safe_change_to_main")
+
+# Obsługa klawiszy numerycznych jako alternatywny sposób wyboru mapy
+func _unhandled_key_input(event):
+	if event.pressed:
+		match event.keycode:
+			KEY_1:
+				_handle_map1_pressed()
+			KEY_2:
+				_handle_map2_pressed()
+			KEY_ESCAPE:
+				get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+
+# Wyświetlanie informacji o mapach
+func display_map_choices(selected_maps):
+	if selected_maps.size() < 2:
+		return
+		
+	selected_maps.shuffle()
+	var map1 = selected_maps[0]
+	var map2 = selected_maps[1]
 	
-	# Wyświetlamy informacje o mapach
-	map1_info.text = "🌍 Mapa: " + map1.name + "\n👾 Wrogowie: " + str(map1.enemies) 
-	map2_info.text = "🌍 Mapa: " + map2.name + "\n👾 Wrogowie: " + str(map2.enemies) 
-
-	# Przypisujemy ID mapek do przycisków
-	map_button_1.set_meta("map_id", map1.map_id)
-	map_button_2.set_meta("map_id", map2.map_id)
-		# ✅ Debugowanie – sprawdzamy, czy ID się przypisały
-		# Debugowanie
-	print("✅ map_button_1 przypisano map_id:", map1.map_id)
-	print("✅ map_button_2 przypisano map_id:", map2.map_id)
-
-# 🎯 Gracz wybiera mapę → przejście do poziomu
-func select_map(map_index):
-	print("📌 Wybrano mapę:", map_index)
-	var chosen_map_id = get_node("VBoxContainer/Map" + str(map_index + 1) + "Container/MapButton" + str(map_index + 1)).get_meta("map_id")
-
-	# Przechodzimy do poziomu, zapisując ID mapy
-	var run_manager = get_tree().get_first_node_in_group("run_manager")
-	if run_manager:
-		run_manager.set_selected_map(chosen_map_id)
+	# Aktualizacja informacji o mapach
+	map1_info.text = "🌍 Mapa: " + map1["name"] + "\n👾 Wrogowie: " + str(map1["enemies"].size())
+	map2_info.text = "🌍 Mapa: " + map2["name"] + "\n👾 Wrogowie: " + str(map2["enemies"].size())
 	
-	# Ładujemy scenę poziomu
-	get_tree().change_scene_to_file("res://Scenes/Main.tscn")
+	# Przypisanie ID map do przycisków
+	map_button_1.set_meta("map_id", map1["map_id"])
+	map_button_2.set_meta("map_id", map2["map_id"])
 
-# ⏪ Powrót do menu głównego
+# Powrót do menu głównego
 func _on_return_pressed():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+
+# Konfiguracja obsługi wejścia i przycisków
+func _ensure_input_handling():
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	set_process_input(true)
+	set_process_unhandled_input(true)
+	
+	if map_button_1 and map_button_2:
+		for button in [map_button_1, map_button_2]:
+			button.mouse_filter = Control.MOUSE_FILTER_STOP
+			button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			button.focus_mode = Control.FOCUS_ALL
+			button.visible = true
+			button.disabled = false
+			
+		# Podłączenie sygnałów przycisków
+		if not map_button_1.pressed.is_connected(_on_button1_pressed):
+			map_button_1.pressed.connect(_on_button1_pressed)
+		if not map_button_2.pressed.is_connected(_on_button2_pressed):
+			map_button_2.pressed.connect(_on_button2_pressed)
+
+# Zdarzenia cyklu życia węzła
+func _enter_tree():
+	_ensure_input_handling()
+
+func _exit_tree():
+	# Czyszczenie połączeń sygnałów
+	if map_button_1 and map_button_1.pressed.is_connected(_on_button1_pressed):
+		map_button_1.pressed.disconnect(_on_button1_pressed)
+	if map_button_2 and map_button_2.pressed.is_connected(_on_button2_pressed):
+		map_button_2.pressed.disconnect(_on_button2_pressed)
+
+# Bezpieczna zmiana sceny na główną scenę gry
+func _safe_change_to_main():
+	var tree = get_tree()
+	if not tree:
+		return
+		
+	tree.paused = false
+	
+	var packed_scene = load("res://Scenes/main.tscn")
+	if packed_scene:
+		call_deferred("_do_change_scene", packed_scene)
+
+# Wykonanie zmiany sceny
+func _do_change_scene(packed_scene):
+	var tree = get_tree()
+	if tree:
+		var result = tree.change_scene_to_packed(packed_scene)
+		if result != OK:
+			print("❌ Błąd podczas zmiany sceny:", result)
